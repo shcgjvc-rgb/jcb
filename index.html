@@ -413,7 +413,7 @@ html[lang=ky] .hero h1{font-size:clamp(30px,4.6vw,62px)}
     <button type="button" class="x" data-close-priv aria-label="Закрыть">×</button>
     <h2 id="ph" data-i="priv_h">Политика конфиденциальности</h2>
     <p data-i="priv_1">Мы собираем только те данные, которые вы указываете в форме: имя, номер телефона и выбранную технику.</p>
-    <p data-i="priv_2">Данные используются для того, чтобы менеджер Autodom Machinery KG связался с вами и подготовил расчёт. Мы не продаём и не передаём их посторонним лицам.</p>
+    <p data-i="priv_2">Данные используются для того, чтобы менеджер Autodom Machinery KG связался с вами и подготовил расчёт. Копия заявки сохраняется в таблице Google, доступ к которой есть только у сотрудников Autodom Machinery KG. Мы не продаём и не передаём данные посторонним лицам.</p>
     <p data-i="priv_3">Сайт использует инструменты аналитики Meta (пиксель), чтобы понимать, какие страницы полезны посетителям, и показывать рекламу. Вы можете ограничить это в настройках браузера и аккаунта.</p>
     <p data-i="priv_4">Чтобы удалить свои данные, напишите нам в WhatsApp +996 999 222 777.</p>
   </div>
@@ -450,7 +450,8 @@ html[lang=ky] .hero h1{font-size:clamp(30px,4.6vw,62px)}
 var CFG = {
   WA: '996999222777',          // номер WhatsApp без плюса
   PIXEL_ID: '1849545803052608', // ID пикселя Meta (набор данных «JCB Autodom сайт»)
-  BACKUP_URL: ''               // адрес для копии заявки (необязательно)
+  BACKUP_URL: 'https://docs.google.com/forms/d/e/1FAIpQLScEert1XCf__2OmRXPgNVlTWZ6-T9d8906sx219LTZbfZ4BBw/formResponse', // копия заявки в таблицу Google (форма «JCB сайт: заявки»)
+  BACKUP_MAP: {name:'entry.1536160797', phone:'entry.96586463', model:'entry.692897400', source:'entry.1127992299'}
 };
 
 /* ===== Тексты ===== */
@@ -491,7 +492,7 @@ f_agree:'Нажимая кнопку, вы соглашаетесь на обр�
 ok_eb:'Заявка',ok_h:'Почти готово',ok_t:'Мы открываем WhatsApp. Нажмите там «Отправить», и менеджер ответит вам.',ok_btn:'Открыть WhatsApp',
 priv_h:'Политика конфиденциальности',
 priv_1:'Мы собираем только те данные, которые вы указываете в форме: имя, номер телефона и выбранную технику.',
-priv_2:'Данные используются для того, чтобы менеджер Autodom Machinery KG связался с вами и подготовил расчёт. Мы не продаём и не передаём их посторонним лицам.',
+priv_2:'Данные используются для того, чтобы менеджер Autodom Machinery KG связался с вами и подготовил расчёт. Копия заявки сохраняется в таблице Google, доступ к которой есть только у сотрудников Autodom Machinery KG. Мы не продаём и не передаём данные посторонним лицам.',
 priv_3:'Сайт использует инструменты аналитики Meta (пиксель), чтобы понимать, какие страницы полезны посетителям, и показывать рекламу. Вы можете ограничить это в настройках браузера и аккаунта.',
 priv_4:'Чтобы удалить свои данные, напишите нам в WhatsApp +996 999 222 777.',
 close:'Закрыть',
@@ -534,7 +535,7 @@ f_agree:'Баскычты басуу менен сиз маалыматты иш
 ok_eb:'Арыз',ok_h:'Дээрлик даяр',ok_t:'WhatsApp ачылууда. Ал жерде «Жөнөтүү» баскычын басыңыз, менеджер сизге жооп берет.',ok_btn:'WhatsApp ачуу',
 priv_h:'Купуялуулук саясаты',
 priv_1:'Биз формада сиз көрсөткөн маалыматты гана чогултабыз: атыңыз, телефон номериңиз жана тандалган техника.',
-priv_2:'Маалымат Autodom Machinery KG менеджери сиз менен байланышып, эсеп даярдашы үчүн колдонулат. Биз аны сатпайбыз жана үчүнчү жактарга бербейбиз.',
+priv_2:'Маалымат Autodom Machinery KG менеджери сиз менен байланышып, эсеп даярдашы үчүн колдонулат. Арыздын көчүрмөсү Google таблицасында сакталат, ага Autodom Machinery KG кызматкерлери гана кире алат. Биз маалыматты сатпайбыз жана үчүнчү жактарга бербейбиз.',
 priv_3:'Сайт Meta аналитика куралдарын (пиксель) колдонот: кайсы беттер пайдалуу экенин түшүнүү жана жарнама көрсөтүү үчүн. Муну браузердин жана аккаунттун жөндөөлөрүндө чектесеңиз болот.',
 priv_4:'Маалыматыңызды өчүртүү үчүн WhatsApp’ка жазыңыз: +996 999 222 777.',
 close:'Жабуу',
@@ -604,8 +605,11 @@ function mountForm(host,src){
     var url='https://wa.me/'+CFG.WA+'?text='+encodeURIComponent(lines.join('\n'));
     track('Lead',{content_name:mv?MODEL_NAMES[mv]:'unknown',source:src,language:lang});
     if(CFG.BACKUP_URL){
-      try{ fetch(CFG.BACKUP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},
-        body:new URLSearchParams({name:name,phone:phone,model:mv,lang:lang,source:src,page:location.href}).toString(),keepalive:true}); }catch(err){}
+      try{
+        var b=new URLSearchParams(), M=CFG.BACKUP_MAP;
+        b.append(M.name,name); b.append(M.phone,fmtPhone(phone)); b.append(M.model,mv?MODEL_NAMES[mv]:'не выбрано'); b.append(M.source,src+' · '+lang);
+        fetch(CFG.BACKUP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:b.toString(),keepalive:true});
+      }catch(err){}
     }
     wa.setAttribute('href',url);
     box.classList.add('done');
