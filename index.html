@@ -604,6 +604,17 @@ $$('[data-contact]').forEach(function(a){a.addEventListener('click',function(){t
   setLang(s);
   if(location.hash==='#form') setTimeout(function(){openForm('','hash')},300);
 })();
+
+/* ===== Всегда начинаем сверху (браузер соцсетей мог вернуть прежнюю позицию) ===== */
+(function(){
+  if('scrollRestoration' in history) history.scrollRestoration='manual';
+  var touched=false, form=location.hash==='#form';
+  ['touchstart','wheel','keydown','mousedown'].forEach(function(t){window.addEventListener(t,function(){touched=true},{passive:true,once:true})});
+  function top(){ if(!touched && !form && window.scrollY>0) window.scrollTo(0,0) }
+  top();
+  window.addEventListener('load',function(){top();setTimeout(top,200);setTimeout(top,800);setTimeout(top,1600)});
+  window.addEventListener('pageshow',function(e){if(e.persisted){touched=false;top()}});
+})();
 </script>
 </body>
 </html>
