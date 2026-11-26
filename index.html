@@ -67,6 +67,7 @@ nav a:hover{opacity:1;color:var(--y)}
 .hero h1{margin-top:20px;font-size:clamp(32px,5.2vw,70px)}
 .hero h1 span{display:block;white-space:nowrap}
 .hero h1 em{display:block;font-style:normal;color:var(--y);white-space:nowrap}
+.hero .lead b{color:var(--y);font-weight:700}
 .hero .lead{margin-top:18px;max-width:40ch;font-size:clamp(17px,1.5vw,20px);color:#ecebe5}
 .hero .ask{margin-top:32px;font-weight:700;font-size:clamp(17px,1.5vw,20px)}
 .hero .btn{margin-top:14px}
@@ -241,7 +242,7 @@ html[lang=ky] .hero h1{font-size:clamp(30px,4.6vw,62px)}
   <div class="wrap">
     <span class="eyebrow" data-i="hero_eyebrow">Официальный дилер JCB в Кыргызстане</span>
     <h1 id="h1"><span data-i="h1a">Новогодняя</span><span data-i="h1c">распродажа JCB</span><em data-i="h1b">до 31 декабря</em></h1>
-    <p class="lead" data-i="hero_sub">Покупайте технику JCB на самых выгодных условиях до 31 декабря. Таких цен больше не будет.</p>
+    <p class="lead" data-i="hero_sub">Покупайте технику JCB <b>на самых выгодных условиях</b> до <b>31 декабря</b>. Таких цен больше не будет.</p>
     <p class="ask" data-i="ask">Оставьте заявку, наш менеджер с вами свяжется</p>
     <button type="button" class="btn lg open-form" data-src="hero"><span data-i="cta">Подать заявку</span></button>
   </div>
@@ -385,7 +386,7 @@ var T = {
 ru:{
 nav_models:'Техника',nav_objects:'Объекты',nav_faq:'Вопросы',cta:'Подать заявку',
 hero_eyebrow:'Официальный дилер JCB в Кыргызстане',h1a:'Новогодняя',h1c:'распродажа JCB',h1b:'до 31 декабря',
-hero_sub:'Покупайте технику JCB на самых выгодных условиях до 31 декабря. Таких цен больше не будет.',ask:'Оставьте заявку, наш менеджер с вами свяжется',
+hero_sub:'Покупайте технику JCB {{на самых выгодных условиях}} до {{31 декабря}}. Таких цен больше не будет.',ask:'Оставьте заявку, наш менеджер с вами свяжется',
 models_h:'Возьмите технику JCB на выгодных условиях',
 m2_h:'Экскаватор-погрузчик',m2_desc:'Универсальная машина для стройки: копает, грузит и переезжает своим ходом. Возьмите на выгодных условиях: лизинг, кредит, индивидуальный расчёт.',
 m1_h:'Гусеничный экскаватор',m1_desc:'Для тяжёлых земляных работ: котлованы, траншеи, дороги. Возьмите на выгодных условиях: лизинг, кредит, индивидуальный расчёт.',
@@ -417,7 +418,7 @@ msg_hi:'Здравствуйте! Заявка с сайта.',msg_name:'Имя'
 ky:{
 nav_models:'Техника',nav_objects:'Объекттер',nav_faq:'Суроолор',cta:'Арыз калтыруу',
 hero_eyebrow:'JCB’нин Кыргызстандагы расмий дилери',h1a:'Жаңы жылдык',h1c:'JCB сатуусу',h1b:'31-декабрга чейин',
-hero_sub:'JCB техникасын эң пайдалуу шарттарда 31-декабрга чейин сатып алыңыз. Мындай баалар мындан ары болбойт.',ask:'Арыз калтырыңыз, биздин менеджер сиз менен байланышат',
+hero_sub:'JCB техникасын {{эң пайдалуу шарттарда}} {{31-декабрга чейин}} сатып алыңыз. Мындай баалар мындан ары болбойт.',ask:'Арыз калтырыңыз, биздин менеджер сиз менен байланышат',
 models_h:'JCB техникасын пайдалуу шарттарда алыңыз',
 m2_h:'Экскаватор-жүктөгүч',m2_desc:'Курулуш үчүн универсалдуу машина: казат, жүктөйт жана өзү жүрүп барат. Пайдалуу шарттарда алыңыз: лизинг, насыя, жеке эсеп.',
 m1_h:'Чынжырлуу экскаватор',m1_desc:'Оор жер иштери үчүн: котлован, траншея, жол куруу. Пайдалуу шарттарда алыңыз: лизинг, насыя, жеке эсеп.',
@@ -465,12 +466,21 @@ function track(ev,params,custom){
 })();
 
 /* ===== Язык ===== */
+/* {{акцент}} в тексте выделяется цветом */
+function setText(el,t){
+  if(t.indexOf('{{')<0){el.textContent=t;return}
+  el.textContent='';
+  t.split(/(\{\{.*?\}\})/).forEach(function(p){
+    if(p.slice(0,2)==='{{'){var b=document.createElement('b');b.textContent=p.slice(2,-2);el.appendChild(b)}
+    else if(p) el.appendChild(document.createTextNode(p));
+  });
+}
 function setLang(l){
   if(!T[l]) l='ru';
   lang=l; var d=T[l];
   document.documentElement.lang=(l==='ky'?'ky':'ru');
   document.title=d.title;
-  $$('[data-i]').forEach(function(el){var k=el.getAttribute('data-i'); if(d[k]!==undefined) el.textContent=d[k];});
+  $$('[data-i]').forEach(function(el){var k=el.getAttribute('data-i'); if(d[k]!==undefined) setText(el,d[k]);});
   $$('[data-i-aria]').forEach(function(el){var k=el.getAttribute('data-i-aria'); if(d[k]!==undefined) el.setAttribute('aria-label',d[k]);});
   $$('.lang button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-lang')===l)});
   store('jcb_lang',l);
