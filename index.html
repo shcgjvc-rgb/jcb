@@ -144,7 +144,7 @@ details p{padding:0 54px 18px 0;color:var(--mut);max-width:66ch}
 .cts{margin-top:32px;padding-top:20px;border-top:3px solid var(--k);display:grid;gap:12px}
 .cts small{display:block;font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.75}
 .cts a,.cts span.v{font-weight:900;font-size:19px;text-decoration:none;line-height:1.3}
-.card-form{background:#fff;padding:clamp(22px,3vw,34px);border-top:6px solid var(--k)}
+.card-form{min-height:440px;background:#fff;padding:clamp(22px,3vw,34px);border-top:6px solid var(--k)}
 
 footer{background:var(--k);color:#c2c1ba;padding:36px 0;font-size:14px}
 footer .row{display:flex;flex-wrap:wrap;gap:16px 40px;align-items:center;justify-content:space-between}
@@ -548,8 +548,14 @@ function mountForm(host,src){
   $('.privOpen',box).addEventListener('click',function(){$('#priv').classList.add('open')});
   return box;
 }
-var inlineBox=mountForm($('#inlineForm'),'inline');
-var modalBox=mountForm($('#modalForm'),'modal');
+/* Формы создаются только когда нужны: встроенные браузеры соцсетей при загрузке находят форму и сами прокручивают к ней */
+var inlineBox=null, modalBox=null;
+function ensureInline(){ if(!inlineBox){inlineBox=mountForm($('#inlineForm'),'inline'); setLang(lang)} return inlineBox }
+function ensureModal(){ if(!modalBox){modalBox=mountForm($('#modalForm'),'modal'); setLang(lang)} return modalBox }
+if('IntersectionObserver' in window){
+  var fo=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){ensureInline();fo.disconnect()}})},{rootMargin:'700px 0px'});
+  fo.observe($('#inlineForm'));
+}else{ window.addEventListener('scroll',function f(){ensureInline();window.removeEventListener('scroll',f)},{passive:true}) }
 
 /* ===== Шапка и плавающая кнопка ===== */
 var hd=$('#hd'), mbar=$('#mbar'), hero=$('.hero');
@@ -573,6 +579,7 @@ if('IntersectionObserver' in window){
 /* ===== Окно заявки ===== */
 var ov=$('#ov'), lastFocus=null;
 function openForm(model,src){
+  ensureModal();
   lastFocus=document.activeElement;
   modalBox.classList.remove('done'); $('form',modalBox).reset(); $$('.fld.err',modalBox).forEach(function(x){x.classList.remove('err')});
   modalBox.setAttribute('data-interest',model||'');
@@ -603,17 +610,6 @@ $$('[data-contact]').forEach(function(a){a.addEventListener('click',function(){t
   var s=q||store('jcb_lang')||((navigator.language||'').toLowerCase().indexOf('ky')===0?'ky':'ru');
   setLang(s);
   if(location.hash==='#form') setTimeout(function(){openForm('','hash')},300);
-})();
-
-/* ===== Всегда начинаем сверху (браузер соцсетей мог вернуть прежнюю позицию) ===== */
-(function(){
-  if('scrollRestoration' in history) history.scrollRestoration='manual';
-  var touched=false, form=location.hash==='#form';
-  ['touchstart','wheel','keydown','mousedown'].forEach(function(t){window.addEventListener(t,function(){touched=true},{passive:true,once:true})});
-  function top(){ if(!touched && !form && window.scrollY>0) window.scrollTo(0,0) }
-  top();
-  window.addEventListener('load',function(){top();setTimeout(top,200);setTimeout(top,800);setTimeout(top,1600)});
-  window.addEventListener('pageshow',function(e){if(e.persisted){touched=false;top()}});
 })();
 </script>
 </body>
